@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: esp-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: endpoints-ip
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    acme.cert-manager.io/http01-edit-in-place: "true"
+  labels:
+    type: endpoints-app
+spec:
+  tls:
+  - hosts:
+    - api.endpoints.[MY-PROJECT].cloud.goog
+    secretName: esp-tls
+  rules:
+  - host: api.endpoints.[MY-PROJECT].cloud.goog
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+            service:
+              name: esp-srv
+              port:
+                number: 80
